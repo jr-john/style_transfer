@@ -8,14 +8,14 @@ Style transfer in text refers to the task of converting the style of one text to
 
 ```
 .
-├── evaluator               # contains custom metric evaluation scripts
+├── evaluators              # contains custom metric evaluation scripts
 ├── scripts                 # contains training scripts
 ├── utils                   # contains additional scripts
 ├── environment.txt         # project level dependencies
 └── README.md
 ```
 
-### `evaluator`
+### `evaluators`
 
 ```
 .
@@ -31,6 +31,13 @@ Style transfer in text refers to the task of converting the style of one text to
 ├── bart.sh                 # finetuning BART for baseline
 ├── bert.sh                 # finetuning BERT classifier
 └── gpt.sh                  # finetuning GPT-2 for baseline
+```
+
+### `utils`
+
+```
+.
+└── bert_cls.py             # train script for BERT classifier fine-tuning
 ```
 
 ## Setting up the environment
