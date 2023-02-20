@@ -361,7 +361,7 @@ if __name__ == "__main__":
                 scores_src.append(score_src)
 
     print("Average CPS:", su / len(scores_src))
-    output_file = f"scores/cps_{corpus}_{split}.txt"
+    output_file = f"cps_{corpus}_{split}.txt"
     output = scores_src
     with open(output_file, "w") as f:
         print(output, file=f)
