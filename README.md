@@ -8,11 +8,29 @@ Style transfer in text refers to the task of converting the style of one text to
 
 ```
 .
+├── baseline_outputs        # contains generation output for baseline model
+├── control_tokens          # contains files used for the approach
 ├── evaluators              # contains custom metric evaluation scripts
 ├── scripts                 # contains training scripts
 ├── utils                   # contains additional scripts
 ├── environment.txt         # project level dependencies
 └── README.md
+```
+
+### `baseline_outputs`
+
+```
+.
+├── generation_em.txt       # baseline generation output for GYAFC-EM
+└── generation_fr.txt       # baseline generation output for GYAFC-FR
+```
+
+### `control_tokens`
+
+```
+.
+├── dataset                 # contains dataset and preparation script
+└── outputs                 # contains generation output for this approach
 ```
 
 ### `evaluators`
@@ -46,6 +64,12 @@ Style transfer in text refers to the task of converting the style of one text to
 conda create --name <env> --file environment.txt
 conda activate <env>
 ```
+
+## Checkpoints
+
+- BART Baseline Checkpoints - [link](https://iiitaphyd-my.sharepoint.com/:u:/g/personal/jerrin_thomas_research_iiit_ac_in/EWjfmq4VxR5IsjjS83H6cA0BSb85YvHkLiEKCewOU_V9CQ?e=RjCdp9)
+- BERT Classifier Checkpoint - [link](https://iiitaphyd-my.sharepoint.com/:u:/g/personal/jerrin_thomas_research_iiit_ac_in/ETS5MMsUchJInSzWyBd5b_ABYIW5oSoUdqTzyhKAX2XQPg?e=ClBh6M)
+- BART+ControlTokens Baseline+ Checkpoints - [link]()
 
 ## Members
 
