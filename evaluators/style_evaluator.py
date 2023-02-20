@@ -1,3 +1,5 @@
+import sys
+import ast
 from typing import List
 import torch
 import numpy as np
@@ -116,22 +118,41 @@ class StyleIntensityClassifier:
         return round(dist * transfer_direction_correction, 4)
 
 
-def StyleEvaluator(corpus):
-    model_path = "checkpoint-100000"
-    sc = StyleIntensityClassifier(model_identifier=model_path)
+def StyleEvaluator(sc, corpus):
     return sc.score(corpus)
 
 
 if __name__ == "__main__":
-    inp_file = "gyafc_em/test.src"
-    gen_file = "generation_em.txt"
+    corpus = sys.argv[1]
+    split = sys.argv[2]
+    label = sys.argv[3]
+    gen_file = f"{corpus}/{split}.{label}"
+    model_path = "checkpoint-100000"
+    sc = StyleIntensityClassifier(model_identifier=model_path)
 
-    with open(inp_file) as f:
-        inp = [line.strip() for line in f]
     with open(gen_file) as f:
         gen = [line.strip() for line in f]
 
-    print("INP")
-    print((StyleEvaluator(inp)))
-    print("GEN")
-    print(StyleEvaluator(gen))
+    su = 0
+    scores_src = []
+
+    # For Tgt in Valid, Test
+    if split in ["test", "valid"] and label == "tgt":
+        for sentencelist in gen:
+            sl = ast.literal_eval(sentencelist)
+            for sentence in sl:
+                score_src = StyleEvaluator(sc, [sentence])
+                su += score_src[0]["score"]
+                scores_src.append(score_src)
+    else:
+        for sentence in gen:
+            score_src = StyleEvaluator(sc, [sentence])
+            su += score_src[0]["score"]
+            scores_src.append(score_src)
+
+    print("Average Style Strength:", su / len(scores_src))
+    output_file = f"scores/style_{corpus}_{split}_{label}.txt"
+    output = scores_src
+    with open(output_file, "w") as f:
+        print(output, file=f)
+        print("Average Style Strength:", su / len(scores_src), file=f)

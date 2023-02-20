@@ -1,3 +1,5 @@
+import sys
+import ast
 from typing import List
 import torch
 import pandas as pd
@@ -314,12 +316,7 @@ class ContentPreservationScorer:
         return sum_embeddings / sum_mask
 
 
-def CPSEvaluator(input_corpus, generate_corpus):
-    sbert_model_path = "sentence-transformers/all-MiniLM-L6-v2"
-    cls_model_path = "checkpoint-100000"
-    cps = ContentPreservationScorer(
-        sbert_model_identifier=sbert_model_path, cls_model_identifier=cls_model_path
-    )
+def CPSEvaluator(cps, input_corpus, generate_corpus):
     return cps.calculate_content_preservation_score(
         input_text=input_corpus,
         output_text=generate_corpus,
@@ -330,11 +327,42 @@ def CPSEvaluator(input_corpus, generate_corpus):
 
 
 if __name__ == "__main__":
-    inp_file = "gyafc_em/test.src"
-    gen_file = "generation_em.txt"
+    corpus = sys.argv[1]
+    split = sys.argv[2]
+    inp_file = f"{corpus}/{split}.src"
+    gen_file = f"{corpus}/{split}.tgt"
+    sbert_model_path = "sentence-transformers/all-MiniLM-L6-v2"
+    cls_model_path = "checkpoint-100000"
+    cps = ContentPreservationScorer(
+        sbert_model_identifier=sbert_model_path, cls_model_identifier=cls_model_path
+    )
 
     with open(inp_file) as f:
         inp = [line.strip() for line in f]
     with open(gen_file) as f:
         gen = [line.strip() for line in f]
-    print(CPSEvaluator(inp, gen))
+    su = 0
+    scores_src = []
+
+    # For Train
+    if split == "train":
+        for sentence1, sentence2 in zip(inp, gen):
+            score_src = CPSEvaluator(cps, [sentence1], [sentence2])
+            su += score_src["scores"][0]
+            scores_src.append(score_src)
+
+    # For Valid, Test
+    if split in ["test", "valid"]:
+        for sentence1, sentencelist in zip(inp, gen):
+            sl = ast.literal_eval(sentencelist)
+            for sentence2 in sl:
+                score_src = CPSEvaluator(cps, [sentence1], [sentence2])
+                su += score_src["scores"][0]
+                scores_src.append(score_src)
+
+    print("Average CPS:", su / len(scores_src))
+    output_file = f"scores/cps_{corpus}_{split}.txt"
+    output = scores_src
+    with open(output_file, "w") as f:
+        print(output, file=f)
+        print("Average CPS:", su / len(scores_src), file=f)

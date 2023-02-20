@@ -1,3 +1,5 @@
+import sys
+import ast
 from typing import List
 import torch
 import numpy as np
@@ -116,20 +118,46 @@ class StyleIntensityClassifier:
         return round(dist * transfer_direction_correction, 4)
 
 
-def STIEvaluator(input_corpus, generate_corpus):
-    model_path = "checkpoint-100000"
-    sc = StyleIntensityClassifier(model_identifier=model_path)
+def STIEvaluator(sc, input_corpus, generate_corpus):
     return sc.calculate_transfer_intensity(
         input_text=input_corpus, output_text=generate_corpus
     )
 
 
 if __name__ == "__main__":
-    inp_file = "gyafc_em/test.src"
-    gen_file = "generation_em.txt"
+    corpus = sys.argv[1]
+    split = sys.argv[2]
+    inp_file = f"{corpus}/{split}.src"
+    gen_file = f"{corpus}/{split}.tgt"
+    model_path = "checkpoint-100000"
+    sc = StyleIntensityClassifier(model_identifier=model_path)
 
     with open(inp_file) as f:
         inp = [line.strip() for line in f]
     with open(gen_file) as f:
         gen = [line.strip() for line in f]
-    print(STIEvaluator(inp, gen))
+    su = 0
+    scores_src = []
+
+    # For Train
+    if split == "train":
+        for sentence1, sentence2 in zip(inp, gen):
+            score_src = STIEvaluator(sc, [sentence1], [sentence2])
+            su += score_src[0]
+            scores_src.append(score_src)
+
+    # For Valid, Test
+    if split in ["test", "valid"]:
+        for sentence1, sentencelist in zip(inp, gen):
+            sl = ast.literal_eval(sentencelist)
+            for sentence2 in sl:
+                score_src = STIEvaluator(sc, [sentence1], [sentence2])
+                su += score_src[0]
+                scores_src.append(score_src)
+
+    print("Average STI:", su / len(scores_src))
+    output_file = f"scores/sti_{corpus}_{split}.txt"
+    output = scores_src
+    with open(output_file, "w") as f:
+        print(output, file=f)
+        print("Average STI:", su / len(scores_src), file=f)
