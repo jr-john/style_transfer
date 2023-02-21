@@ -28,9 +28,9 @@ tss_data = read_scores(tss_path)
 sti_data = read_scores(sti_path)
 cps_data = read_scores(cps_path)
 
-tss_scores = [item[0]["score"] for item in tss_data]
-sti_scores = [item[0] for item in sti_data]
-cps_scores = [item["scores"][0] for item in cps_data]
+tss_scores = [round(item[0]["score"], 2) for item in tss_data]
+sti_scores = [round(item[0], 2) for item in sti_data]
+cps_scores = [round(item["scores"][0], 2) for item in cps_data]
 
 tss_avg = read_avg(tss_path)
 sti_avg = read_avg(sti_path)
