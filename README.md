@@ -37,6 +37,7 @@ Style transfer in text refers to the task of converting the style of one text to
 
 ```
 .
+├── analysis                # contains notebooks with analysis of evaluators
 ├── cps_evaluator.py        # Content Preservation Score
 ├── sti_evaluator.py        # Style Transfer Intensity
 └── style_evaluator.py      # Style Strength
